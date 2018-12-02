@@ -392,7 +392,6 @@ class gacWorker(Thread):
           matches = re.search('\.(png|gif|jpg|jpeg)', filename)
           if(matches is not None):
             asset["preview"] = os.path.join(dirpath.replace(asset["path"], ""), filename)
-            pprint.pprint(asset["preview"])
             break
         if(asset["preview"] is not None):
           break
