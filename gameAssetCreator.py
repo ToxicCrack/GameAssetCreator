@@ -185,11 +185,16 @@ class gacWorker(Thread):
         #pprint.pprint("Scanning..")
         wx.CallAfter(pub.sendMessage, "update", msg = "Scanning...")
         self._notify_window.m_progressBar.SetValue(0)
+        self.assets = []
         self.scanDirs(self._notify_window.m_rootDirPicker.GetPath())
         numAsset = 0
         #pprint.pprint(self.assets)
         for asset in self.assets:
             if(self._want_abort == 0):
+                #overriden type?
+                if(self._notify_window.m_typeOverride.GetStringSelection() != "Autodetect"):
+                  asset["type"] = self._notify_window.m_typeOverride.GetStringSelection()
+              
                 #Parse Websites
                 if(self.parseAssetUrls and asset["url"] is not None):
                     wx.CallAfter(pub.sendMessage, "update", msg = "Parse URL for %s..." % asset["name"])
@@ -342,6 +347,14 @@ class gacWorker(Thread):
             output = re.search(regex, text, flags=re.IGNORECASE)
             if output is not None:
               tags[posTag] = posTag
+              
+        # add overriden tags
+        addTags = self._notify_window.m_addTags.GetValue().split(";")
+        for addTag in addTags:
+          addTag = addTag.strip()
+          if(addTag != ""):
+            tags[addTag] = addTag
+              
         return tags
   
     def guessUrl(self, text, currentURL):
@@ -392,6 +405,7 @@ class gacWorker(Thread):
           matches = re.search('\.(png|gif|jpg|jpeg)', filename)
           if(matches is not None):
             asset["preview"] = os.path.join(dirpath.replace(asset["path"], ""), filename)
+            #pprint.pprint(asset["preview"])
             break
         if(asset["preview"] is not None):
           break

@@ -18,9 +18,9 @@ import wx.adv
 class mainDialog ( wx.Dialog ):
 
 	def __init__( self, parent ):
-		wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"GameAssetCreator", pos = wx.DefaultPosition, size = wx.Size( 500,500 ), style = wx.DEFAULT_DIALOG_STYLE )
+		wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"GameAssetCreator", pos = wx.DefaultPosition, size = wx.Size( 500,580 ), style = wx.DEFAULT_DIALOG_STYLE )
 
-		self.SetSizeHints( wx.Size( 500,500 ), wx.Size( 500,500 ) )
+		self.SetSizeHints( wx.Size( 500,580 ), wx.Size( 500,580 ) )
 
 		bSizer1 = wx.BoxSizer( wx.VERTICAL )
 
@@ -89,6 +89,24 @@ class mainDialog ( wx.Dialog ):
 		self.m_randomPreviewFallback = wx.CheckBox( self.GeneralTab, wx.ID_ANY, u"if otherwise none is found", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_randomPreviewFallback.SetValue(True)
 		fgSizer1.Add( self.m_randomPreviewFallback, 0, wx.ALL, 5 )
+
+		self.m_staticText121 = wx.StaticText( self.GeneralTab, wx.ID_ANY, u"Add Tags to all ( ; separated)", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText121.Wrap( -1 )
+
+		fgSizer1.Add( self.m_staticText121, 0, wx.ALL, 5 )
+
+		self.m_addTags = wx.TextCtrl( self.GeneralTab, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer1.Add( self.m_addTags, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL|wx.EXPAND, 5 )
+
+		self.m_staticText1211 = wx.StaticText( self.GeneralTab, wx.ID_ANY, u"Override Type", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText1211.Wrap( -1 )
+
+		fgSizer1.Add( self.m_staticText1211, 0, wx.ALL, 5 )
+
+		m_typeOverrideChoices = [ u"Autodetect", u"2D", u"3D", u"Audio", u"GUI" ]
+		self.m_typeOverride = wx.ComboBox( self.GeneralTab, wx.ID_ANY, u"- Select a type -", wx.DefaultPosition, wx.DefaultSize, m_typeOverrideChoices, wx.CB_DROPDOWN|wx.CB_READONLY )
+		self.m_typeOverride.SetSelection( 0 )
+		fgSizer1.Add( self.m_typeOverride, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL|wx.EXPAND, 5 )
 
 
 		self.GeneralTab.SetSizer( fgSizer1 )
