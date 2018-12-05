@@ -19,6 +19,7 @@ import json
 from wx.lib.pubsub import pub
 import wx.stc
 from parserOpengameart import parserOpengameart
+from parserGamedevmarket import parserGamedevmarket
 
 # Define notification event for thread completion
 EVT_RESULT_ID = wx.Window.NewControlId()
@@ -149,11 +150,13 @@ class gacWorker(Thread):
     lock = Lock()
     assets = []
     parsers = {
-        "opengameart.org": parserOpengameart()
+        "opengameart.org": parserOpengameart(),
+        "gamedevmarket.net": parserGamedevmarket()
     }
     previewSoundRegex = r'(preview|sample)\.(mp3)'
     previewImageRegex = r'(preview|sample)\.(png|jpg|jpeg|gif)'
     textFileRegex = r'(info|credits|readme|liesmich|license)\.(txt|md)'
+    urlFileRegex = r'\.(url)'
     
     overwriteMetaJson = True
     guessTagsFromDescription = False
@@ -314,6 +317,11 @@ class gacWorker(Thread):
                 if output is not None:
                   with open(os.path.join(dirpath, filename), mode="r", errors='ignore') as read_file:
                     asset["url"] = self.guessUrl(read_file.read(), asset["url"])
+                else:
+                  output = re.search(self.urlFileRegex, filename, flags=re.IGNORECASE)
+                  if output is not None:
+                    with open(os.path.join(dirpath, filename), mode="r", errors='ignore') as read_file:
+                      asset["url"] = self.guessUrl(read_file.read(), asset["url"])
             break
 
   
@@ -392,9 +400,13 @@ class gacWorker(Thread):
             if(matches is not None):
                 parser = self.parsers[parserDomain]
                 parserData = parser.parse(asset["url"])
-                if(len(parserData["tags"]) > 0):
+                if("tags" in parserData and len(parserData["tags"]) > 0):
                     for tag in parserData["tags"]:
                         asset["tags"][tag] = tag
+                if("description" in parserData and parserData["description"] != ""):
+                    asset["description"] = parserData["description"]
+                if("name" in parserData and parserData["name"] != ""):
+                    asset["name"] = parserData["name"]
                         
     def createSpriteSheet(self, asset):
       pass

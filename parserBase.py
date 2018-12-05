@@ -6,14 +6,22 @@
 #The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 #THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import urllib.request
+from urllib.request import Request, urlopen
+import re
 
 class parserBase:
     def getHtml(self, url):
-        fp = urllib.request.urlopen(url)
-        mybytes = fp.read()
+        q = Request(url)
+        q.add_header('accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8')
+        q.add_header('accept-language', 'de-DE,de;q=0.9,en-US;q=0.8,en;q=0.7')
+        q.add_header('user-agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.80 Safari/537.36')
+        mybytes = urlopen(q).read()
 
         html = mybytes.decode("utf8")
-        fp.close()
         
         return html
+      
+    def cleanhtml(self, raw_html):
+      cleanr = re.compile('<.*?>')
+      cleantext = re.sub(cleanr, '', raw_html)
+      return cleantext
