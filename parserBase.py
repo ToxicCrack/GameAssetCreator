@@ -8,6 +8,7 @@
 
 from urllib.request import Request, urlopen
 import re
+import os
 
 class parserBase:
     def getHtml(self, url):
@@ -20,6 +21,17 @@ class parserBase:
         html = mybytes.decode("utf8")
         
         return html
+      
+    def saveURL(self, url, path):
+        q = Request(url)
+        q.add_header('accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8')
+        q.add_header('accept-language', 'de-DE,de;q=0.9,en-US;q=0.8,en;q=0.7')
+        q.add_header('user-agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.80 Safari/537.36')
+        mybytes = urlopen(q).read()
+        
+        path = os.path.join(path, os.path.basename(url))
+        with open(path, 'w+b') as file:
+          file.write(bytearray(mybytes))
       
     def cleanhtml(self, raw_html):
       cleanr = re.compile('<.*?>')

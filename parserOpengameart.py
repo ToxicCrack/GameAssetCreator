@@ -11,7 +11,7 @@ import pprint
 import re
 
 class parserOpengameart(parserBase):
-    def parse(self, url):
+    def parse(self, url, asset):
         tags = []
         #field-name-field-art-tags
         html = self.getHtml(url)

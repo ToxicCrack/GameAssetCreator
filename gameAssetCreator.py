@@ -18,8 +18,9 @@ import json
 #from wx.lib.pubsub import setupkwargs
 from wx.lib.pubsub import pub
 import wx.stc
-from parserOpengameart import parserOpengameart
-from parserGamedevmarket import parserGamedevmarket
+from parserOpengameart import *
+from parserGamedevmarket import *
+from parserTokegameart import *
 
 # Define notification event for thread completion
 EVT_RESULT_ID = wx.Window.NewControlId()
@@ -151,7 +152,8 @@ class gacWorker(Thread):
     assets = []
     parsers = {
         "opengameart.org": parserOpengameart(),
-        "gamedevmarket.net": parserGamedevmarket()
+        "gamedevmarket.net": parserGamedevmarket(),
+        "tokegameart.net": parserTokegameart()
     }
     previewSoundRegex = r'(preview|sample)\.(mp3)'
     previewImageRegex = r'(preview|sample)\.(png|jpg|jpeg|gif)'
@@ -399,7 +401,7 @@ class gacWorker(Thread):
             matches = re.search(regex, asset["url"], flags=re.IGNORECASE)
             if(matches is not None):
                 parser = self.parsers[parserDomain]
-                parserData = parser.parse(asset["url"])
+                parserData = parser.parse(asset["url"], asset)
                 if("tags" in parserData and len(parserData["tags"]) > 0):
                     for tag in parserData["tags"]:
                         asset["tags"][tag] = tag

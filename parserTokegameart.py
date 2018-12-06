@@ -10,18 +10,19 @@ from parserBase import *
 import pprint
 import re
 
-class parserGamedevmarket(parserBase):
+class parserTokegameart(parserBase):
     def parse(self, url, asset):
         tags = []
         description = ""
         name = ""
         #field-name-field-art-tags
         html = self.getHtml(url)
-        matches = re.findall('https://www.gamedevmarket.net/tag/([a-zA-Z0-9\-\./_\)\(]*)"', html, flags=re.IGNORECASE)
+        matches = re.findall('https://tokegameart.net/tag/([a-zA-Z0-9\-\./_\)\(]*)', html, flags=re.IGNORECASE)
         if(matches is not None):
             tags = matches
+            tags = [tag.strip("/") for tag in tags]
 
-        matches = re.search('<div class="item__description__content">(.*?)</div>', html, flags=re.IGNORECASE)
+        matches = re.search('<div .*? id="tab-description" .*?>(.*?)<div class="product-single-meta">', html, flags=re.IGNORECASE)
         if(matches is not None):
             description = matches.group(1).replace("</p>", "\n")
             description = description.replace("</li>", "\n")
@@ -29,8 +30,14 @@ class parserGamedevmarket(parserBase):
             description = description.replace("<br />", "\n")
             description = self.cleanhtml(description)
         
-        matches = re.search('<meta name="twitter:title" content="(.*?)"', html, flags=re.IGNORECASE)
+        matches = re.search('<h1 itemprop="name" class="product_title entry-title">(.*?)</h1>', html, flags=re.IGNORECASE)
         if(matches is not None):
-          name = matches.group(1).replace(" | GameDev Market", "")
+          name = matches.group(1)
+          
+        matches = re.search('<meta name="twitter:image" content="(.*?)"', html, flags=re.IGNORECASE)
+        if(matches is not None):
+          preview = matches.group(1)
+          self.saveURL(preview, asset['path'])
+        
             
         return {"tags": tags, "description": description, "name": name}
