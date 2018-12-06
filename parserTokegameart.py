@@ -22,7 +22,7 @@ class parserTokegameart(parserBase):
             tags = matches
             tags = [tag.strip("/") for tag in tags]
 
-        matches = re.search('<div .*? id="tab-description" .*?>(.*?)<div class="product-single-meta">', html, flags=re.IGNORECASE)
+        matches = re.search('<div .*? id="tab-description">(.*?)<div class="product-single-meta">', html, flags=re.I | re.DOTALL)
         if(matches is not None):
             description = matches.group(1).replace("</p>", "\n")
             description = description.replace("</li>", "\n")

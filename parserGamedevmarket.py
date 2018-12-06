@@ -21,7 +21,7 @@ class parserGamedevmarket(parserBase):
         if(matches is not None):
             tags = matches
 
-        matches = re.search('<div class="item__description__content">(.*?)</div>', html, flags=re.IGNORECASE)
+        matches = re.search('<div class="item__description__content">(.*?)</div>', html, flags=re.I | re.DOTALL)
         if(matches is not None):
             description = matches.group(1).replace("</p>", "\n")
             description = description.replace("</li>", "\n")

@@ -23,4 +23,9 @@ class parserOpengameart(parserBase):
         if(matches is not None):
             tags.append(matches.group(1))
             
+        matches = re.search('<meta name="twitter:image" content="(.*?)"', html, flags=re.IGNORECASE)
+        if(matches is not None):
+          preview = matches.group(1)
+          self.saveURL(preview, asset['path'])
+            
         return {"tags": tags}
