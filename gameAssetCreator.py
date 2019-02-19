@@ -21,6 +21,9 @@ import wx.stc
 from parserOpengameart import *
 from parserGamedevmarket import *
 from parserTokegameart import *
+from parserItch import *
+from parserUnity import *
+from parserUnreal import *
 
 # Define notification event for thread completion
 EVT_RESULT_ID = wx.Window.NewControlId()
@@ -153,11 +156,15 @@ class gacWorker(Thread):
     parsers = {
         "opengameart.org": parserOpengameart(),
         "gamedevmarket.net": parserGamedevmarket(),
-        "tokegameart.net": parserTokegameart()
+        "tokegameart.net": parserTokegameart(),
+        "itch.io": parserItch(),
+        "assetstore.unity.com": parserUnity(),
+        "unrealengine.com": parserUnreal()
     }
     previewSoundRegex = r'(preview|sample)\.(mp3)'
     previewImageRegex = r'(preview|sample)\.(png|jpg|jpeg|gif)'
     textFileRegex = r'(info|credits|readme|liesmich|license)\.(txt|md)'
+    textFileRegexMinor = r'(.*?)\.(txt|md)'
     urlFileRegex = r'\.(url)'
     
     overwriteMetaJson = True
@@ -312,6 +319,13 @@ class gacWorker(Thread):
                       asset["description"] = read_file.read()
                       if(self.guessTagsFromDescription):
                         asset["tags"] = self.guessTags(asset["description"], asset["tags"])
+                        
+                  if(asset["description"] == None):
+                    #still nothing found
+                    output = re.search(self.textFileRegexMinor, filename, flags=re.IGNORECASE)
+                    if output is not None:
+                      with open(os.path.join(dirpath, filename), mode="r", encoding='utf-8', errors='ignore') as read_file:
+                        asset["description"] = read_file.read()
 
               #URL
               if(depth >= self.assetDirDepth):
@@ -321,6 +335,13 @@ class gacWorker(Thread):
                     asset["url"] = self.guessUrl(read_file.read(), asset["url"])
                 else:
                   output = re.search(self.urlFileRegex, filename, flags=re.IGNORECASE)
+                  if output is not None:
+                    with open(os.path.join(dirpath, filename), mode="r", errors='ignore') as read_file:
+                      asset["url"] = self.guessUrl(read_file.read(), asset["url"])
+                      
+                if(asset["url"] == None):
+                  #still nothing found
+                  output = re.search(self.textFileRegexMinor, filename, flags=re.IGNORECASE)
                   if output is not None:
                     with open(os.path.join(dirpath, filename), mode="r", errors='ignore') as read_file:
                       asset["url"] = self.guessUrl(read_file.read(), asset["url"])
@@ -397,7 +418,7 @@ class gacWorker(Thread):
             return None
         #check if the url is one of our parsers
         for parserDomain in self.parsers:
-            regex = r'http[s]?:\/\/(www\.)?('+parserDomain+')([-a-zA-Z0-9@:%_\\+.~#?&//=]*)?'
+            regex = r'http[s]?:\/\/(.*?\.)?('+parserDomain+')([-a-zA-Z0-9@:%_\\+.~#?&//=]*)?'
             matches = re.search(regex, asset["url"], flags=re.IGNORECASE)
             if(matches is not None):
                 parser = self.parsers[parserDomain]
@@ -409,6 +430,8 @@ class gacWorker(Thread):
                     asset["description"] = parserData["description"]
                 if("name" in parserData and parserData["name"] != ""):
                     asset["name"] = parserData["name"]
+                if("preview" in parserData and parserData["preview"] != ""):
+                    asset["preview"] = parserData["preview"]
                         
     def createSpriteSheet(self, asset):
       pass
